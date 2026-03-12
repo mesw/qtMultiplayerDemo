@@ -1,0 +1,24 @@
+# ── Client build output ───────────────────────────────────────────────────────
+# Ignore all build contents (use * not trailing slash so negations below work)
+client/build/*
+
+# Un-ignore the WASM Release dir, then ignore its contents, then keep 5 files
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/
+client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/*
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/QtMultiplayerClient.html
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/QtMultiplayerClient.js
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/QtMultiplayerClient.wasm
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/qtloader.js
+!client/build/WebAssembly_Qt_6_8_3_single_threaded-Release/qtlogo.svg
+
+# ── Server ────────────────────────────────────────────────────────────────────
+server/node_modules/
+
+# ── Qt Creator ────────────────────────────────────────────────────────────────
+*.pro.user
+CMakeLists.txt.user
+*.autosave
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
