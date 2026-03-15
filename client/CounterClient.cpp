@@ -29,6 +29,13 @@ void CounterClient::setServerUrl(const QString &url)
     emit serverUrlChanged();
 }
 
+void CounterClient::setInitials(const QString &s)
+{
+    if (m_initials == s) return;
+    m_initials = s;
+    emit initialsChanged();
+}
+
 void CounterClient::connectToServer()
 {
     if (m_serverUrl.isEmpty()) return;
@@ -38,7 +45,7 @@ void CounterClient::connectToServer()
 void CounterClient::increment()
 {
     if (!m_connected) return;
-    const QJsonObject msg{ { "type", "increment" } };
+    const QJsonObject msg{ { "type", "increment" }, { "initials", m_initials } };
     m_socket.sendTextMessage(QString::fromUtf8(QJsonDocument(msg).toJson(QJsonDocument::Compact)));
 }
 
@@ -65,6 +72,11 @@ void CounterClient::onTextMessageReceived(const QString &message)
     if (obj.value("type").toString() == "counter") {
         m_counter = obj.value("value").toInt();
         emit counterChanged();
+        const QString newLeader = obj.value("leader").toString();
+        if (m_leader != newLeader) {
+            m_leader = newLeader;
+            emit leaderChanged();
+        }
     }
 }
 

@@ -23,9 +23,12 @@ export class CounterRoom implements DurableObject {
     // Hibernation API — Cloudflare manages the socket lifecycle
     this.ctx.acceptWebSocket(server);
 
-    // Sync current counter to the new client immediately
-    const counter = (await this.ctx.storage.get<number>("counter")) ?? 0;
-    server.send(JSON.stringify({ type: "counter", value: counter }));
+    // Sync current counter and leader to the new client immediately
+    const [counter, leader] = await Promise.all([
+      this.ctx.storage.get<number>("counter"),
+      this.ctx.storage.get<string>("leader"),
+    ]);
+    server.send(JSON.stringify({ type: "counter", value: counter ?? 0, leader: leader ?? "" }));
 
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -34,7 +37,7 @@ export class CounterRoom implements DurableObject {
   // WebSocket Hibernation handlers
   // ------------------------------------------------------------------
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
-    let data: { type: string };
+    let data: { type: string; initials?: string };
     try {
       data = JSON.parse(typeof message === "string" ? message : new TextDecoder().decode(message));
     } catch {
@@ -42,10 +45,11 @@ export class CounterRoom implements DurableObject {
       return;
     }
 
-    if (data.type === "increment") {
+    if (data.type === "increment" && typeof data.initials === "string") {
       const counter = ((await this.ctx.storage.get<number>("counter")) ?? 0) + 1;
       await this.ctx.storage.put("counter", counter);
-      this.broadcast({ type: "counter", value: counter });
+      await this.ctx.storage.put("leader", data.initials);
+      this.broadcast({ type: "counter", value: counter, leader: data.initials });
     }
   }
 
