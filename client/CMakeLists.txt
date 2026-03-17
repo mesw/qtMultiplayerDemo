@@ -52,6 +52,8 @@ if(EMSCRIPTEN)
         QT_WASM_INITIAL_MEMORY "32MB"
         # Single-threaded WASM (no SharedArrayBuffer requirement)
         QT_WASM_PTHREAD_POOL_SIZE 0
+        # Custom dark-mode HTML shell (Qt 6.5+)
+        QT_WASM_HTML_FILE "${CMAKE_CURRENT_SOURCE_DIR}/wasm_shell.html"
     )
 
     # Qt's WASM toolchain generates the .html wrapper automatically
